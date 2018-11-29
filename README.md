@@ -1,5 +1,5 @@
 # graphite-clickhouse-tldr
-Graphite-ClickHouse + Grafana + StatsD with Docker-compose
+Graphite-ClickHouse + Grafana + StatsD with [Docker-compose](https://docs.docker.com/compose/install/)
 
 # Quick Start
 ```sh
@@ -11,6 +11,9 @@ Open http://127.0.0.1:3000/ in browser
 
 ## Work scheme
 ![schema.jpg](doc/schema.png?v3)
+
+### Docker-compose install:
+https://docs.docker.com/compose/install/
 
 ### Mapped Ports
 
