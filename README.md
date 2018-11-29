@@ -1,6 +1,5 @@
 # graphite-clickhouse-tldr
-Graphite-ClickHouse + Grafana + StatsD with Docker-compose
-[install docker-compose](https://docs.docker.com/compose/install/)
+Graphite-ClickHouse + Grafana + StatsD with [docker-compose](https://docs.docker.com/compose/install/)
 
 # Quick Start
 ```sh
