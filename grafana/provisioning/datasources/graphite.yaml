@@ -2,9 +2,11 @@
 apiVersion: 1
 
 datasources:
- - name: graphite
+ - name: graphite1
    type: graphite
    access: proxy
    orgId: 1
    url: http://carbonapi:80
    isDefault: True
+   jsonData:
+     graphiteVersion: "1.1"
