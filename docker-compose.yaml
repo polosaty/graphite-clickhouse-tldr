@@ -65,9 +65,9 @@ services:
     hostname: apphost
     image: "telegraf"
     environment:
-    - "HOST_PROC: /rootfs/proc"
-    - "HOST_SYS: /rootfs/sys"
-    - "HOST_ETC: /rootfs/etc"
+    - HOST_PROC=/rootfs/proc
+    - HOST_SYS=/rootfs/sys
+    - HOST_ETC=/rootfs/etc
     volumes:
     - "./telegraf.conf:/etc/telegraf/telegraf.conf:ro"
     - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -77,7 +77,7 @@ services:
     networks:
     - default
   bioyino:
-    image: vkolobaev/bioyino:latest
+    image: pik4ez/bioyino:0.6.0
     volumes:
     - "./bioyino.toml:/etc/bioyino/bioyino.toml"
     ports:
