@@ -52,11 +52,10 @@ services:
     networks:
     - default
   grafana:
-    image: grafana/grafana:6.3.5
+    build: grafana/.
+    image: grafana-preconfigured
     volumes:
-    - "./grafana/grafana.ini:/etc/grafana/grafana.ini"
-    - "./grafana/provisioning:/etc/grafana/provisioning"
-    - "./grafana/graphite-clickhouse.json:/var/lib/grafana/dashboards/graphite-clickhouse.json"
+    - "grafana-storage:/var/lib/grafana"
     ports:
     - "3000:3000"
     networks:
@@ -88,3 +87,6 @@ services:
 
 networks:
   default:
+
+volumes:
+  grafana-storage:

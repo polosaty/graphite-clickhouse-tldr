@@ -23,20 +23,14 @@
         "conditions": [
           {
             "evaluator": {
-              "params": [
-                100
-              ],
+              "params": [100],
               "type": "lt"
             },
             "operator": {
               "type": "and"
             },
             "query": {
-              "params": [
-                "A",
-                "3m",
-                "now"
-              ]
+              "params": ["A", "3m", "now"]
             },
             "reducer": {
               "params": [],
@@ -1125,9 +1119,7 @@
   "refresh": "10s",
   "schemaVersion": 16,
   "style": "dark",
-  "tags": [
-    "monitoring"
-  ],
+  "tags": ["monitoring"],
   "templating": {
     "list": []
   },
@@ -1148,17 +1140,7 @@
       "2h",
       "1d"
     ],
-    "time_options": [
-      "5m",
-      "15m",
-      "1h",
-      "6h",
-      "12h",
-      "24h",
-      "2d",
-      "7d",
-      "30d"
-    ]
+    "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
   },
   "timezone": "",
   "title": "Graphite-clickhouse",
