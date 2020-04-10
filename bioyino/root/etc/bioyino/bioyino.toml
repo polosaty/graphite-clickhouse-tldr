@@ -2,7 +2,7 @@
 # Required options are filled with default values
 # Non-required options are commented with defaul values in comments
 
-verbosity = "debug"
+verbosity = "warn"
 
 # Number of network worker threads in any mode, use 0(not recommended) to use all CPU cores
 n-threads = 1
