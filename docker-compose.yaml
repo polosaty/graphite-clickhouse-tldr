@@ -8,6 +8,7 @@ services:
     - "clickhouse-metadata:/var/lib/clickhouse/metadata"
     networks:
     - default
+    restart: always
   clickhouse-init:
     build: clickhouse/.
     image: clickhouse-preconfigured
@@ -32,11 +33,13 @@ services:
     - "2006:2006" # prometheus remote write
     networks:
     - default
+    restart: always
   graphite-clickhouse:
     build: graphite-clickhouse/.
     image: graphite-clickhouse-preconfigured
     networks:
     - default
+    restart: always
   carbonapi:
     build: carbonapi/.
     image: carbonapi-preconfigured
@@ -44,6 +47,7 @@ services:
     - "80:80"
     networks:
     - default
+    restart: always
   grafana:
     build: grafana/.
     image: grafana-preconfigured
@@ -53,6 +57,7 @@ services:
     - "3000:3000"
     networks:
     - default
+    restart: always
   telegraf:
     hostname: apphost
     build: telegraf/.
@@ -68,6 +73,7 @@ services:
     - "/etc:/rootfs/etc:ro"
     networks:
     - default
+    restart: always
   bioyino:
     build: bioyino/.
     image: bioyino-preconfigured
@@ -76,6 +82,7 @@ services:
     - "8136:8136"
     networks:
     - default
+    restart: always
 
 networks:
   default:
