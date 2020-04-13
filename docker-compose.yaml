@@ -1,20 +1,19 @@
 version: '3.5'
 services:
   clickhouse:
-    image: yandex/clickhouse-server:19.15.3.6
+    build: clickhouse/.
+    image: clickhouse-preconfigured
     volumes:
-    - "./rollup.xml:/etc/clickhouse-server/config.d/rollup.xml"
-    - "./metrics.xml:/etc/clickhouse-server/config.d/metrics.xml"
-    - "./data/clickhouse/data:/var/lib/clickhouse/data"
-    - "./data/clickhouse/metadata:/var/lib/clickhouse/metadata"
+    - "clickhouse-data:/var/lib/clickhouse/data"
+    - "clickhouse-metadata:/var/lib/clickhouse/metadata"
     networks:
     - default
-    labels:
-    - "collectd_docker_app"
+    restart: always
   clickhouse-init:
-    image: yandex/clickhouse-server:19.15.3.6
+    build: clickhouse/.
+    image: clickhouse-preconfigured
     volumes:
-    - "./init.sql:/init.sql"
+    - "./clickhouse/init.sql:/init.sql"
     entrypoint: |
       bash -c '
         sleep 5
@@ -23,10 +22,10 @@ services:
     networks:
     - default
   carbon-clickhouse:
-    image: lomik/carbon-clickhouse:0.8.2
+    build: carbon-clickhouse/.
+    image: carbon-clickhouse-preconfigured
     volumes:
-    - "./data/carbon-clickhouse:/data/carbon-clickhouse/data"
-    - "./carbon-clickhouse.conf:/etc/carbon-clickhouse/carbon-clickhouse.conf"
+    - "carbon-clickhouse-data:/data/carbon-clickhouse/data"
     ports:
     - "2003:2003" # plain tcp
     - "2003:2003/udp" # plain udp
@@ -34,57 +33,62 @@ services:
     - "2006:2006" # prometheus remote write
     networks:
     - default
+    restart: always
   graphite-clickhouse:
-    image: lomik/graphite-clickhouse:latest
-    volumes:
-    - "./rollup.xml:/etc/graphite-clickhouse/rollup.xml"
-    - "./graphite-clickhouse.conf:/etc/graphite-clickhouse/graphite-clickhouse.conf"
+    build: graphite-clickhouse/.
+    image: graphite-clickhouse-preconfigured
     networks:
     - default
+    restart: always
   carbonapi:
-    image: openmetric/carbonapi
-    volumes:
-    - "./carbonapi.yaml:/etc/carbonapi.yaml"
-    entrypoint: |
-      sh -c 'carbonapi -config /etc/carbonapi.yaml'
+    build: carbonapi/.
+    image: carbonapi-preconfigured
     ports:
     - "80:80"
     networks:
     - default
+    restart: always
   grafana:
-    image: grafana/grafana:6.3.5
+    build: grafana/.
+    image: grafana-preconfigured
     volumes:
-    - "./grafana/grafana.ini:/etc/grafana/grafana.ini"
-    - "./grafana/provisioning:/etc/grafana/provisioning"
-    - "./grafana/graphite-clickhouse.json:/var/lib/grafana/dashboards/graphite-clickhouse.json"
+    - "grafana-data:/var/lib/grafana"
     ports:
     - "3000:3000"
     networks:
     - default
+    restart: always
   telegraf:
     hostname: apphost
-    image: "telegraf"
+    build: telegraf/.
+    image: telegraf-preconfigured
     environment:
-    - "HOST_PROC: /rootfs/proc"
-    - "HOST_SYS: /rootfs/sys"
-    - "HOST_ETC: /rootfs/etc"
+    - HOST_PROC=/rootfs/proc
+    - HOST_SYS=/rootfs/sys
+    - HOST_ETC=/rootfs/etc
     volumes:
-    - "./telegraf.conf:/etc/telegraf/telegraf.conf:ro"
     - "/var/run/docker.sock:/var/run/docker.sock:ro"
     - "/sys:/rootfs/sys:ro"
     - "/proc:/rootfs/proc:ro"
     - "/etc:/rootfs/etc:ro"
     networks:
     - default
+    restart: always
   bioyino:
-    image: vkolobaev/bioyino:latest
-    volumes:
-    - "./bioyino.toml:/etc/bioyino/bioyino.toml"
+    build: bioyino/.
+    image: bioyino-preconfigured
     ports:
     - "8126:8126/udp"
     - "8136:8136"
     networks:
     - default
+    restart: always
 
 networks:
   default:
+
+volumes:
+  grafana-data:
+  clickhouse-data:
+  clickhouse-metadata:
+  carbon-clickhouse-data:

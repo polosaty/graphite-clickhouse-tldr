@@ -1,0 +1,238 @@
+# This is an example config showing all the possible options
+# Required options are filled with default values
+# Non-required options are commented with defaul values in comments
+
+verbosity = "warn"
+
+# Number of network worker threads in any mode, use 0(not recommended) to use all CPU cores
+n-threads = 1
+
+# Number of aggregating and counting threads, use 0(not recommended) to use all CPU cores
+w-threads = 1
+
+# Queue size for single counting thread before task is dropped
+task-queue-size = 1
+
+# If server should become leader from it's very start
+start-as-leader = true
+
+# How often to gather own stats, in ms. Use 0 to disable (stats are still gathered and printed to log,
+# but not included in metric dump
+stats-interval = 10000
+
+# Prefix for sending own stats
+stats-prefix = "resources.monitoring.bioyino"
+
+# What consensus to use: "consul", "internal" or "none"
+consensus = "none"
+
+[carbon]
+
+# IP and port of the carbon-protocol backend to send aggregated data to
+address = "carbon-clickhouse:2003"
+
+# Address to bind carbon client to when connecting
+# default: not specified, so no bind happens
+# bind-address = "127.0.0.1:2003"
+
+# How often to send metrics to carbon backend, ms
+interval = 3000
+
+# How much to sleep when connection to backend fails, ms
+connect-delay = 250
+
+# Multiply delay to this value for each consequent connection failure, float
+connect-delay-multiplier = 2
+
+# Maximum retry delay, ms
+connect-delay-max = 10000
+
+# How much times to retry when sending data to backend before giving up and dropping all metrics
+#note, that 0 means 1 try
+send-retries = 30
+
+# Network settings
+[network]
+# Address:port to listen for metrics at
+listen = "0.0.0.0:8126"
+
+# Address and port for replication server to listen on
+peer-listen = "0.0.0.0:8136"
+
+# Address for peer client to bind to
+# format is string with ip:port as with other addresses
+# Only binds if specified, doesn't do binding if not
+# peer-client-bind = <unspecified>
+
+# Address and port for management server to listen on
+mgmt-listen = "0.0.0.0:8137"
+
+# UDP buffer size for single packet. Needs to be around MTU. Packet's bytes after that value
+# may be lost
+bufsize = 1500
+
+# Enable multimessage(recvmmsg) mode
+multimessage = false
+
+# Number of multimessage packets to receive at once if in multimessage mode
+# Note that this setting is per thread, so in reality one can only see metrics
+# after receiving at least mm-packets*n_threads datagrams
+mm-packets = 1
+
+# Do multimessage operations in async mode.
+# This means recvmmsg will receive 0..mm-packets datagrams instead of waiting for mm-packets
+mm-async = false
+
+# Multimessage mode assumes early return by timeout, but ONLY when received
+# a packet after timeout expiration.
+# Basically this should be changed in very rare and specific cases.
+# 0 means this value will be equal to buffer-flush-time
+# mm-timeout = 0
+
+# To avoid packets staying in queue forever, this option can be used to flush
+# incoming data buffer forcing it to be sent even if it's not full, ms
+buffer-flush-time = 5000
+
+# Same as buffer-flush-time, but riggers on buffer length. Please, notice that multimessage
+# mode can only consider timer, so this check is only possible every mm-packets packets.
+# zero value means automatic management depending on memory allocator internal logic,
+# which on tests was found to reach 30Mb
+# if in multimessage mode this value is lower that mm-packets*bufsize, it will be set to this value
+buffer-flush-length = 65536
+
+# Nmber of green threads for single-message mode
+greens = 1
+
+# Socket pool size for single-message mode
+async-sockets = 1
+
+# List of nodes to replicate metrics to
+nodes = []
+
+# Interval to send snapshots to nodes, ms
+snapshot-interval = 1000
+
+[metrics]
+# Process buffers from different hosts separately, this gives more guarantee to parse
+# metrics from different hosts correctly. Can play bad if lots of metrics is received from a single host, set
+# it to false if you have such use case
+# consistent-parsing = true
+
+# Log all buffers being dropped due to parsing errors. Can be very spammy.
+# log-parse-errors = false
+
+# Size of buffer that parser considers invalid. Used to avoid DoS attacks on parser.
+# Increase this if you have metrics taking more than 1000 bytes
+# max-unparsed-buffer = 10000
+
+# Size of tags part of a metric (after semicolon character, not including the leading semicolon itself)
+# max-tags-len = 9000
+
+# Since tagged metric becomes a totally different metric in many systems the timeseries for such metrics
+# can be broken. To avoid this for the time the metrics is adopted, this option allows to create a copy of
+# such tagged metric, but without tags
+# Please note that this is effectively the double amount of memory and processing times
+# create-untagged-copy = false
+
+[aggregation]
+# round timestamp to interval of aggregation
+# possible values:
+# "up" - round to uppor bound of interval
+# "down" - round to lower bound
+# "no" - use exact timestamp, i.e. no rounding
+# round-timestamp = "no"
+
+# the threading mode of aggregation:
+# single - in a single thread
+# common - in the general thread pool along with parsing ang aggregating metrics
+# separate - in a separate thread pool
+mode = "single"
+
+# available values: smart (explained below), name, tag, both
+# smart means uto detection based on existence of tags in the metric,
+# so, for example sum for `some.metric` will be aggregated as `some.metric.sum`
+# but for `some.metric;tag=value` it will automatically become `some.metric;tag=value;aggregate=sum`
+destination = "smart"
+
+# updates aggregate is usually a debug value than some real one
+# also thi is the only one used for every type of metric, not only ms
+# so it's reasonable to avoid receiving a doubled amount of all metrics
+# This option allows to receive only metrics updated too often
+update-count-threshold = 200
+
+# a list of aggregates gatheredfor each ms-typed metric
+# please, note that setting this value will define the exact way, so, i.e. ["mean"] will gather ONLY ONE aggregate
+#
+# To add new percentiles an integer value with "precentile-" prefix should be used.
+# It will then be "appended" (in reality this is not string based calculation) with "0."
+# For example, "percentile-9999" will become 0.9999th percentile
+#
+# this is the full list of default values
+#ms-aggregates = [ "count", "last", "min", "max", "sum", "median", "mean", "updates", "percentile-75", "percentile-95", "percentile-98", "percentile-99", "percentile-999" ]
+
+# these attributes allow to change naming of aggregates in name postfix, prefix or in tags
+# by default names are the same as aggregate names, except for percentiles
+# percentile postfixes by default look like "percentile.99"
+
+# NOT defaults, just example
+#postfix-replacements = { "min" = "lower", "max" = "upper", "percentile-50" = "percentile.50" }
+postfix-replacements = { "updates" = "" }
+
+# prefix specific aggregates with specified string
+# all prefixes are empty by default
+# NOTE: you most probably want EITHER prefix or postfix, so having prefix specified here,
+# don't forget to explicitly set postfix to ""
+#
+# NOT defaults, just example
+#prefix-replacements = { "updates" = "resources.monitoring.bioyino.updates" }
+prefix-replacements = { "updates" = "resources.monitoring.bioyino.updates" }
+
+#tag-replacements = { "min" = "lower", "max" = "upper", "percentile-50" = "percentile.50" }
+
+# the default tag name taken when replacement is not specified
+# tag-name = "aggregate"
+
+# Settings for internal Raft
+[raft]
+# Defer start of raft consensus to avoid node becoming leader too early
+# Such situation is very likely when restarting current leader node
+# and means losing metrics in most cases
+#start-delay = 0
+
+# Timeouts tuned according to the Raft paper and typical network latency.
+# Better not to change if unsure
+#heartbeat-timeout = 250
+#election-timeout-min = 500
+#election-timeout-max = 750
+
+# The name of the current node is taken from hostname by default
+# After that all hostnames are resolved using DNS. If node name cannot
+# be resolved through DNS for some reason, it can be specified in this-node
+# parameter in a format similar to one in node list.
+# this-node = <empty>
+
+# A map of other raft nodes. Keys are in form of hostname:port or IP:port
+# values are integer IDs
+# this map is crucial to have the same address <-> ID mappings for all nodes
+nodes = {}
+
+# allow binding raft outgoing connnections to specific IP
+# default: not specified, so no bind happens
+# client-bind = "127.0.0.1:8138"
+
+[consul]
+# Start in disabled leader finding mode. This only works while consul is bootstrapping.
+# Can be helpful when there is a danger of agent being inaccessible.
+start-as = "enabled"
+
+# Consul agent address
+agent = "127.0.0.1:8500"
+
+# TTL of consul session, ms (Consul cannot set it to less than 10s)
+session-ttl = 11000
+
+# How often to renew Consul session, ms
+renew-time = 1000
+
+# Key name to lock in Consul
+key-name = "service/bioyino/lock"
