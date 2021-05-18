@@ -8,6 +8,8 @@ services:
     - "clickhouse-metadata:/var/lib/clickhouse/metadata"
     networks:
     - default
+    ports:
+    - 127.0.0.1:8123:8123
     restart: always
   clickhouse-init:
     build: clickhouse/.
@@ -44,7 +46,7 @@ services:
     build: carbonapi/.
     image: carbonapi-preconfigured
     ports:
-    - "80:80"
+    - "83:80"
     networks:
     - default
     restart: always
@@ -67,22 +69,22 @@ services:
     - HOST_SYS=/rootfs/sys
     - HOST_ETC=/rootfs/etc
     volumes:
-    - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    - "/var/run/docker.sock:/var/run/docker.sock"
     - "/sys:/rootfs/sys:ro"
     - "/proc:/rootfs/proc:ro"
     - "/etc:/rootfs/etc:ro"
     networks:
     - default
     restart: always
-  bioyino:
-    build: bioyino/.
-    image: bioyino-preconfigured
-    ports:
-    - "8126:8126/udp"
-    - "8136:8136"
-    networks:
-    - default
-    restart: always
+  # bioyino:
+  #   build: bioyino/.
+  #   image: bioyino-preconfigured
+  #   ports:
+  #   - "8126:8126/udp"
+  #   - "8136:8136"
+  #   networks:
+  #   - default
+  #   restart: always
 
 networks:
   default:
